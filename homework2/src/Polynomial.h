@@ -7,6 +7,7 @@ using namespace std;
 class Polynomial;
 class Term{
     friend Polynomial;
+    friend ostream& operator<<(ostream& out, const Polynomial& poly);
 
 private:
     float coef;
