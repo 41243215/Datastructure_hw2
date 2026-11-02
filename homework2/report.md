@@ -76,7 +76,7 @@
 | `src/Polynomial.cpp` | 實作記憶體管理、計算與輸入輸出 |
 | `src/main.cpp` | 讀取兩個多項式，讓使用者選擇操作 |
 
-`Term` 將 `Polynomial` 宣告為友好類別，讓它的成員函式可以存取係數與指數。`operator<<` 也需要分別成為兩個類別的 `friend`，因為友好關係不會自動傳遞。
+`Term` 將 `Polynomial` 宣告為友好類別，讓它的成員函式可以存取係數與指數。`operator<<` 也需要分別成為兩個類別的 `friend` ，因為友好關係不會自動傳遞。
 
 因為類別使用動態陣列，所以另外實作解構子、複製建構子與複製指定運算子。複製物件時會配置自己的陣列，再複製各項內容，避免只複製位址，造成兩個物件共用陣列或重複釋放同一塊空間。
 
@@ -187,14 +187,14 @@ Polynomial Polynomial::Add(Polynomial b){
     Polynomial c;
     int aPos = 0;
     int bPos = 0;
-
+    
     while((aPos < terms) && (bPos < b.terms)){
         if(termArray[aPos].exp == b.termArray[bPos].exp){
             float t = termArray[aPos].coef + b.termArray[bPos].coef;
 
             if(t)
                 c.NewTerm(t, termArray[aPos].exp);
-
+            
             aPos++;
             bPos++;
         }
@@ -218,7 +218,7 @@ Polynomial Polynomial::Add(Polynomial b){
 
 float Polynomial::Eval(float f){
     float result = 0;
-
+    
     for(int i = 0; i < terms; i++)
         result += termArray[i].coef * pow(f, termArray[i].exp);
     return result;
@@ -228,7 +228,7 @@ Polynomial Polynomial::Mult(Polynomial b){
     Polynomial c;
     for(int i = 0; i < terms; i++){
         Polynomial temp;
-
+        
         for(int j = 0; j < b.terms; j++){
             float coefficient = termArray[i].coef * b.termArray[j].coef;
             int exponent = termArray[i].exp + b.termArray[j].exp;
@@ -245,7 +245,7 @@ Polynomial Polynomial::Mult(Polynomial b){
 ostream& operator<<(ostream& out, const Polynomial& poly){
     if(poly.terms == 0)
         out << 0;
-
+    
     else{
         for(int i = 0; i < poly.terms; i++){
             float coefficient = poly.termArray[i].coef;
@@ -260,10 +260,10 @@ ostream& operator<<(ostream& out, const Polynomial& poly){
                 else
                     out << " - ";
             }
-            out << fabs(coefficient); //取浮點數絕對值
+            out << fabs(coefficient);  //取浮點數絕對值
 
             int exponent = poly.termArray[i].exp;
-
+            
             if(exponent > 0){
                 out << "x";
                 if(exponent > 1){
@@ -294,7 +294,7 @@ istream& operator>>(istream& in, Polynomial& poly){
 
         if(!(in >> coefficient >> exponent))
             return in;
-
+        
         if(coefficient == 0 || exponent < 0){
             in.setstate(ios::failbit);
             return in;
@@ -307,7 +307,7 @@ istream& operator>>(istream& in, Polynomial& poly){
         temp.NewTerm(coefficient, exponent);
     }
     poly = temp;
-
+    
     return in;
 }
 ```
@@ -331,7 +331,7 @@ int main(){
         cout << "輸入格式錯誤\n";
         return 1;
     }
-
+    
     char type;
     bool keepRun = true;
 
@@ -371,12 +371,13 @@ int main(){
                     break;
                 }
             default:
-                cout << "請輸入 1 / + / * / x 來選擇要如何實作Polynomial" << "\n";
+                cout << "請輸入 1 / + / * 來選擇要如何實作Polynomial" << "\n";
                 keepRun = false;
                 break;
+            
         }
     }
-
+    
     return 0;
 }
 ```
@@ -396,6 +397,8 @@ int main(){
 | 輸入 | 正常情況下，新增 $t$ 項合計為 $O(t)$，最後指定也為 $O(t)$ | 暫存及指定時的新陣列為 $O(t)$ |
 | 輸出 | 固定每項文字長度下為 $O(t)$ | 固定數量的區域變數，額外空間為 $O(1)$ |
 
+空間分析以額外建立的資料為主。輸入輸出的字元讀寫成本另受數字位數影響；`pow()` 的實際耗時也受函式庫及參數影響，這裡主要比較走訪項數的次數。
+
 ### 加法分析
 
 每次比較後，`aPos`、`bPos` 至少有一個往下一格移動，不會回頭重新處理相同的項。兩邊剩下的項也只各複製一次，所以是 $O(m+n)$。
@@ -412,7 +415,9 @@ c = c.Add(temp);
 
 如果不同項的乘積沒有相同指數，第 $i$ 輪的累計結果可能已經有約 $in$ 項。反覆合併的成本上界會像：
 
-$$n+2n+3n+\cdots+mn=O(m^2n)$$
+$$
+n+2n+3n+\cdots+mn=O(m^2n)
+$$
 
 `operator=` 複製各輪結果的成本也包含在這個上界裡。這是目前以左邊作為外層迴圈的分析；若乘積有很多同類項，實際結果會比較短，執行時間也可能較少。若其中一邊是零多項式，項目相乘與合併的工作也會減少，仍需考慮參數複製與迴圈檢查的成本。
 
@@ -420,7 +425,7 @@ $$n+2n+3n+\cdots+mn=O(m^2n)$$
 
 ### 測試案例
 
-本次先編譯目前的 `.cpp` 檔，再以固定輸入執行測試。一般測試使用 $a=2x+3$、$b=x+1$；其他案例在表內另列。表內「實際結果」節錄結果文字，不重複列出每次的選單提示。
+本次先編譯目前的.cpp檔，再以固定輸入執行測試。一般測試使用 $a=2x+3$、$b=x+1$；其他案例在表內另列。表內「實際結果」節錄結果文字，不重複列出每次的選單提示。
 
 | 測試案例 | 操作或輸入 | 預期結果 | 實際結果 |
 | --- | --- | --- | --- |
