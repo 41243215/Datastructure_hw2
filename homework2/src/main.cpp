@@ -57,7 +57,6 @@ int main(){
                 cout << "請輸入 1 / + / * 來選擇要如何實作Polynomial" << "\n";
                 keepRun = false;
                 break;
-            
         }
     }
     
