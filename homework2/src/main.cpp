@@ -19,7 +19,11 @@ int main(){
     bool keepRun = true;
 
     cout << "輸入'1'列出多項式\n" << "輸入'+'相加多項式\n" << "輸入'*'相乘多項式\n";
-    cin >> type;
+    if(!(cin >> type)){
+        cout << "無法讀取選項\n";
+        return 1;
+    }
+
     while(keepRun){
         switch (type){
             case '1':
@@ -28,31 +32,32 @@ int main(){
                 keepRun = false;
                 break;
             case '+':
-                cout << "(" << a << ")" << " + " << "(" << b << ")" << " = " << a.Add(b) << "\n";
                 c = a.Add(b);
+                cout << "(" << a << ")" << " + " << "(" << b << ")" << " = " << c << "\n";
                 type = 'x';
                 break;
             case '*':
-                cout << "(" << a << ")" << " + " << "(" << b << ")" << " = " << a.Mult(b) << "\n";
                 c = a.Mult(b);
+                cout << "(" << a << ")" << " * " << "(" << b << ")" << " = " << c << "\n";
                 type = 'x';
                 break;
             case 'x':
-                int xx;
+                float xx;
                 cout << "輸入 x = ";
                 if(!(cin >> xx)){
                     keepRun = false;
                     break;
-            }
-            else{
-                cout << "x = " << xx << ", answer = " << c.Eval(xx) << "\n";
+                }
+                else{
+                    cout << "x = " << xx << ", answer = " << c.Eval(xx) << "\n";
+                    keepRun = false;
+                    break;
+                }
+            default:
+                cout << "請輸入 1 / + / * / x 來選擇要如何實作Polynomial" << "\n";
                 keepRun = false;
                 break;
-            }
-            /*default:
-                cout << "請輸入 1 / + / * / x 來選擇要如何實作Polynomial" << "\n";
-                break;
-            */
+            
         }
     }
     
