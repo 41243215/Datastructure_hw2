@@ -316,6 +316,7 @@ istream& operator>>(istream& in, Polynomial& poly){
 
 ```cpp
 #include "Polynomial.h"
+#include <chrono>
 
 int main(){
     Polynomial a, b, c;
@@ -348,16 +349,48 @@ int main(){
                 cout << "Polynomial b : " << b << "\n";
                 keepRun = false;
                 break;
-            case '+':
-                c = a.Add(b);
-                cout << "(" << a << ")" << " + " << "(" << b << ")" << " = " << c << "\n";
+            case '+':{
+                const int repeat = 2000;
+
+                auto start = chrono::steady_clock::now();
+
+                for(int i = 0; i < repeat; i++){
+                    c = a.Add(b);
+                }
+
+                auto end = chrono::steady_clock::now();
+
+                chrono::duration<double, micro> elapsed = end - start;
+                double average = elapsed.count() / repeat;
+
+                cout << "(" << a << ") + (" << b << ") = " << c << "\n";
+                cout << "重複執行：" << repeat << " 次\n";
+                cout << "平均耗時：" << average << " 微秒\n";
+
                 type = 'x';
                 break;
-            case '*':
-                c = a.Mult(b);
-                cout << "(" << a << ")" << " * " << "(" << b << ")" << " = " << c << "\n";
+            }
+            case '*':{
+                const int repeat = 100;
+
+                auto start = chrono::steady_clock::now();
+
+                for(int i = 0; i < repeat; i++){
+                    c = a.Mult(b);
+                }
+
+                auto end = chrono::steady_clock::now();
+
+                chrono::duration<double, micro> elapsed = end - start;
+                double average = elapsed.count() / repeat;
+
+                cout << "(" << a << ") * (" << b << ") = " << c << "\n";
+                cout << "重複執行：" << repeat << " 次\n";
+                cout << "平均耗時：" << average << " 微秒\n";
+
                 type = 'x';
                 break;
+            }
             case 'x':
                 float xx;
                 cout << "輸入 x = ";
@@ -374,12 +407,12 @@ int main(){
                 cout << "請輸入 1 / + / * 來選擇要如何實作Polynomial" << "\n";
                 keepRun = false;
                 break;
-            
         }
     }
     
     return 0;
 }
+
 ```
 
 ## 效能分析
@@ -480,6 +513,18 @@ g++ -std=c++17 -Wall -Wextra main.cpp Polynomial.cpp -o main.exe
 輸入 x = 2
 x = 2, answer = 10
 ```
+
+### 效能量測
+
+透過 `std::chrono::steady_clock` 計時。
+
+以下資料使用`<chrono>` 實作，宣告了 `repeat` = 2000，意思是同一組資料重複計算2000次，來模擬程式跑很多次的結果：
+
+| 左右各自項數 $n$ | 加法組合操作平均時間（微秒） | 乘法組合操作平均時間（微秒） |
+| ---: | ---: | ---: |
+| 10 | 0.273 | 7.374 |
+| 20 | 0.458 | 25.222 |
+| 40 | 0.782 | 153.431 |
 
 ## 申論及開發報告
 
