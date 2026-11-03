@@ -1,4 +1,5 @@
 #include "Polynomial.h"
+#include <chrono>
 
 int main(){
     Polynomial a, b, c;
@@ -31,16 +32,48 @@ int main(){
                 cout << "Polynomial b : " << b << "\n";
                 keepRun = false;
                 break;
-            case '+':
-                c = a.Add(b);
-                cout << "(" << a << ")" << " + " << "(" << b << ")" << " = " << c << "\n";
+            case '+':{
+                const int repeat = 2000;
+
+                auto start = chrono::steady_clock::now();
+
+                for(int i = 0; i < repeat; i++){
+                    c = a.Add(b);
+                }
+
+                auto end = chrono::steady_clock::now();
+
+                chrono::duration<double, micro> elapsed = end - start;
+                double average = elapsed.count() / repeat;
+
+                cout << "(" << a << ") + (" << b << ") = " << c << "\n";
+                cout << "重複執行：" << repeat << " 次\n";
+                cout << "平均耗時：" << average << " 微秒\n";
+
                 type = 'x';
                 break;
-            case '*':
-                c = a.Mult(b);
-                cout << "(" << a << ")" << " * " << "(" << b << ")" << " = " << c << "\n";
+            }
+            case '*':{
+                const int repeat = 100;
+
+                auto start = chrono::steady_clock::now();
+
+                for(int i = 0; i < repeat; i++){
+                    c = a.Mult(b);
+                }
+
+                auto end = chrono::steady_clock::now();
+
+                chrono::duration<double, micro> elapsed = end - start;
+                double average = elapsed.count() / repeat;
+
+                cout << "(" << a << ") * (" << b << ") = " << c << "\n";
+                cout << "重複執行：" << repeat << " 次\n";
+                cout << "平均耗時：" << average << " 微秒\n";
+
                 type = 'x';
                 break;
+            }
             case 'x':
                 float xx;
                 cout << "輸入 x = ";
